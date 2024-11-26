@@ -1,26 +1,26 @@
-# Paso 1: Imagen base para React
+# Etapa de construcción de React
 FROM node:18 AS build
 
-# Paso 2: Establecer el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /app
 
-# Paso 3: Copiar los archivos del proyecto React
+# Copiar package.json y package-lock.json
 COPY ./frontend/package.json ./frontend/package-lock.json ./
 
-# Paso 4: Instalar las dependencias
+# Instalar dependencias
 RUN npm install
 
-# Paso 5: Construir la aplicación React
+# Copiar todo el código fuente de frontend
 COPY ./frontend ./
-RUN npm run build
 
-# Paso 6: Servir los archivos estáticos usando Nginx
+# Construir la aplicación de React
+RUN npm run build  # Esto generará la carpeta dist en lugar de build
+
+# Etapa de Nginx para servir los archivos estáticos
 FROM nginx:alpine
 
-# Copiar los archivos estáticos construidos a la carpeta de Nginx
-COPY --from=build /app/build /usr/share/nginx/html
+# Copiar los archivos generados en la etapa de construcción (dist) a la carpeta pública de Nginx
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exponer el puerto en el que se sirve la app
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,7 +1,7 @@
-# Usar una imagen base de PHP
+# Paso 1: Imagen base de PHP con Apache
 FROM php:8.2-apache
 
-# Instalar dependencias necesarias para PHP (si es necesario)
+# Paso 2: Instalar dependencias necesarias para PHP (si se requiere)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -9,14 +9,17 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd
 
-# Habilitar mod_rewrite para Apache
+# Paso 3: Habilitar mod_rewrite para Apache (si se necesita)
 RUN a2enmod rewrite
 
-# Configurar la carpeta de trabajo en el contenedor
+# Paso 4: Establecer el directorio de trabajo en el contenedor
 WORKDIR /var/www/html
 
-# Copiar archivos PHP al contenedor
+# Paso 5: Copiar el código PHP al contenedor
 COPY ./backend /var/www/html/
 
-# Exponer el puerto 80 para PHP
+# Exponer el puerto 80 en el contenedor para acceder al backend
 EXPOSE 80
+
+# Comando para iniciar Apache en primer plano
+CMD ["apache2-foreground"]
